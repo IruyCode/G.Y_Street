@@ -14,6 +14,10 @@ import { ROUTES } from '../utils/constants';
 import Button from '../components/common/Button';
 import Modal from '../components/common/Modal';
 import AddProducts from '../components/products/addproducts';
+import DataTable from 'datatables.net-react';
+import DT from 'datatables.net-dt';
+
+DataTable.use(DT);
 
 /**
  * Products Page Component
@@ -143,7 +147,7 @@ export const ProductsPage = () => {
           />
         </Modal>
 
-        {/* Search and Filters */}
+        {/* Search and Filters 
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1 relative">
@@ -161,11 +165,11 @@ export const ProductsPage = () => {
               <option>Alimentos</option>
             </select>
           </div>
-        </div>
+        </div> */}
 
         {products.length > 0 ? (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <table className="min-w-full divide-y divide-gray-200">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden p-4 sm:p-6">
+            <DataTable className="w-full table-auto border-collapse text-sm text-left">
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
@@ -181,7 +185,11 @@ export const ProductsPage = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{product.name}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 capitalize">{product.category}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{Number(product.price).toFixed(2)}€</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.stock}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${product.stock > 0 ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
+                        {product.stock}
+                      </span>
+                    </td>
 
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex justify-end gap-2">
@@ -204,7 +212,7 @@ export const ProductsPage = () => {
                   </tr>
                 ))}
               </tbody>
-            </table>
+            </DataTable>
           </div>
         ) : (
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
