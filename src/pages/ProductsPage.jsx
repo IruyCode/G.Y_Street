@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { Link } from 'react-router-dom';
 import {
@@ -6,20 +7,69 @@ import {
   Package,
   Plus,
   Search,
+  Pencil,
+  Trash2
 } from 'lucide-react';
 import { ROUTES } from '../utils/constants';
 import Button from '../components/common/Button';
+import Modal from '../components/common/Modal';
+import AddProducts from '../components/products/addproducts';
 
 /**
  * Products Page Component
- * Product management page (placeholder for future CRUD implementation)
  */
 export const ProductsPage = () => {
   const { user, logout } = useAuth();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [products, setProducts] = useState([]);
+  const [editingProduct, setEditingProduct] = useState(null);
+
+  // Função para carregar produtos 
+  const loadProducts = () => {
+    const stored = JSON.parse(localStorage.getItem('products') || '[]');
+    setProducts(stored);
+  };
+
+  // Carrega os produtos assim que a página carrega
+  useEffect(() => {
+    loadProducts();
+  }, []);
+
+  // Esta função é chamada pelo AddProducts quando o save tem sucesso
+  const handleProductAdded = () => {
+    setIsModalOpen(false); // Fecha o Modal
+    loadProducts();        // Recarrega a lista do LocalStorage para atualizar a tabela
+  };
+
+  //Edição de produtos
+  const handleOpenEdit = (product) => {
+    setEditingProduct(product); // Passa os dados do produto para o estado
+    setIsModalOpen(true);
+  };
+
+  const handleOpenAdd = () => {
+    setEditingProduct(null); // Garante que o form vem vazio
+    setIsModalOpen(true);
+  };
+
+  const handleProductSuccess = () => {
+    setIsModalOpen(false);
+    setEditingProduct(null);
+    loadProducts();
+  };
+
+  const handleDelete = (id) => {
+    if (window.confirm('Tem a certeza que deseja eliminar este produto?')) {
+      const stored = JSON.parse(localStorage.getItem('products') || '[]');
+      const filtered = stored.filter(p => p.id !== id);
+      localStorage.setItem('products', JSON.stringify(filtered));
+      loadProducts(); 
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
+      {/* --- HEADER --- */}
       <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
@@ -49,7 +99,7 @@ export const ProductsPage = () => {
         </div>
       </header>
 
-      {/* Navigation */}
+      {/* --- NAVIGATION --- */}
       <nav className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex gap-6">
@@ -69,7 +119,7 @@ export const ProductsPage = () => {
         </div>
       </nav>
 
-      {/* Main Content */}
+      {/* --- MAIN CONTENT --- */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Page Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
@@ -77,11 +127,21 @@ export const ProductsPage = () => {
             <h2 className="text-3xl font-bold text-gray-900 mb-2">Produtos</h2>
             <p className="text-gray-600">Gerir o seu inventário de produtos</p>
           </div>
-          <Button variant="primary">
+          <Button variant="primary" onClick={handleOpenAdd}>
             <Plus className="w-4 h-4 mr-2" />
             Adicionar Produto
           </Button>
         </div>
+
+        <Modal 
+            isOpen={isModalOpen} 
+            onClose={() => setIsModalOpen(false)} 
+            title={editingProduct ? "Editar Produto" : "Novo Produto"} >
+          <AddProducts 
+            onSuccess={handleProductSuccess} 
+            initialData={editingProduct} 
+          />
+        </Modal>
 
         {/* Search and Filters */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
@@ -103,31 +163,64 @@ export const ProductsPage = () => {
           </div>
         </div>
 
-        {/* Empty State */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gray-100 rounded-full mb-4">
-            <Package className="w-10 h-10 text-gray-400" />
-          </div>
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">
-            Nenhum Produto Encontrado
-          </h3>
-          <p className="text-gray-600 mb-6 max-w-md mx-auto">
-            Ainda não tem produtos no inventário. Comece por adicionar o seu
-            primeiro produto para gerir o stock.
-          </p>
-          <Button variant="primary" size="lg">
-            <Plus className="w-5 h-5 mr-2" />
-            Adicionar Primeiro Produto
-          </Button>
+        {products.length > 0 ? (
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoria</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Preço</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {products.map((product) => (
+                  <tr key={product.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{product.name}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 capitalize">{product.category}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{Number(product.price).toFixed(2)}€</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.stock}</td>
 
-          <div className="mt-8 pt-8 border-t border-gray-200">
-            <p className="text-sm text-gray-500">
-              💡 <strong>Dica:</strong> Esta página é um placeholder. A
-              funcionalidade CRUD de produtos será implementada na próxima fase
-              do projeto.
-            </p>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <div className="flex justify-end gap-2">
+                        <button 
+                          onClick={() => handleOpenEdit(product)} 
+                          className="p-1 text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+                          title="Editar"
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </button>
+                        <button 
+                          onClick={() => handleDelete(product.id)}
+                          className="p-1 text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                          title="Eliminar"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        </div>
+        ) : (
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-gray-100 rounded-full mb-4">
+              <Package className="w-10 h-10 text-gray-400" />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">Nenhum Produto Encontrado</h3>
+            <p className="text-gray-600 mb-6 max-w-md mx-auto">
+              Ainda não tem produtos no inventário. Comece por adicionar o seu primeiro produto para gerir o stock.
+            </p>
+            <Button variant="primary" size="lg" onClick={() => setIsModalOpen(true)}> 
+              <Plus className="w-5 h-5 mr-2" />
+              Adicionar Primeiro Produto
+            </Button>
+          </div>
+        )}
       </main>
     </div>
   );
