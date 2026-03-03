@@ -71,6 +71,23 @@ export const ProductsPage = () => {
     }
   };
 
+  const tableOptions = {
+    dom: '<"flex justify-between items-center mb-4"<"search"f><"length"l>>tip',
+    language: {
+      search: '',
+      searchPlaceholder: 'Procurar...',
+      lengthMenu: 'Mostrar _MENU_ resultados',
+      zeroRecords: 'Nenhum resultado encontrado',
+      paginate: {
+        previous: '<--',
+        next: '-->'
+      },
+      info: '_START_ de _TOTAL_',
+      infoEmpty: '0 a 0 de 0 entradas',
+      infoFiltered: '(_MAX_ resultado/s no total)'
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* --- HEADER --- */}
@@ -169,7 +186,10 @@ export const ProductsPage = () => {
 
         {products.length > 0 ? (
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden p-4 sm:p-6">
-            <DataTable className="w-full table-auto border-collapse text-sm text-left">
+            <DataTable
+              className="w-full table-auto border-collapse text-sm text-left"
+              options={tableOptions}
+            >
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
