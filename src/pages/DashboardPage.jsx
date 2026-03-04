@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { Link } from 'react-router-dom';
 import {
@@ -12,6 +13,8 @@ import {
 } from 'lucide-react';
 import { ROUTES } from '../utils/constants';
 import Button from '../components/common/Button';
+import Modal from '../components/common/Modal';
+import AddProducts from '../components/products/addproducts';
 
 /**
  * Dashboard Page Component
@@ -19,32 +22,61 @@ import Button from '../components/common/Button';
  */
 export const DashboardPage = () => {
   const { user, logout } = useAuth();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null);
+
+  const handleOpenAdd = () => {
+    setEditingProduct(null);
+    setIsModalOpen(true);
+  };
+
+  const handleProductSuccess = () => {
+    setIsModalOpen(false);
+    setEditingProduct(null);
+    loadProducts();
+  };
+
+  const [products, setProducts] = useState([]);
+
+  const loadProducts = () => {
+    const stored = JSON.parse(localStorage.getItem('products') || '[]');
+    setProducts(stored);
+  };
+
+  React.useEffect(() => {
+    loadProducts();
+  }, []);
+
+  const totalProducts = products.length;
+  const lowStockCount = products.filter(p => Number(p.stock) < 5).length;
+  const totalValue = products.reduce((sum, p) => sum + Number(p.price || 0), 0);
+  const categoryCount = new Set(products.map(p => p.category)).size;
 
   const stats = [
     {
       label: 'Total de Produtos',
-      value: '0',
+      value: totalProducts,
       icon: Package,
       color: 'text-primary-600',
       bgColor: 'bg-primary-100',
     },
     {
       label: 'Stock Baixo',
-      value: '0',
+      value: lowStockCount,
       icon: AlertTriangle,
       color: 'text-yellow-600',
       bgColor: 'bg-yellow-100',
     },
     {
       label: 'Valor Total',
-      value: '€0,00',
+      value: `€${totalValue.toFixed(2)}`,
       icon: TrendingUp,
       color: 'text-green-600',
       bgColor: 'bg-green-100',
     },
     {
       label: 'Categorias',
-      value: '0',
+      value: categoryCount,
       icon: BarChart3,
       color: 'text-purple-600',
       bgColor: 'bg-purple-100',
@@ -138,12 +170,12 @@ export const DashboardPage = () => {
             </Link>
 
             <button
-              className="flex items-center gap-3 p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition-all group text-left"
-              onClick={() => alert('Funcionalidade em desenvolvimento')}
+              className="flex items-center gap-3 p-4 border-2 border-gray-200 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition-all group"
+              onClick={handleOpenAdd}
             >
-              <Home className="w-6 h-6 text-gray-400 group-hover:text-primary-600" />
+              <Home className="w-6 h-6 text-gray-600 group-hover:text-primary-600" />
               <div>
-                <p className="font-medium text-gray-600 group-hover:text-primary-600">
+                <p className="font-medium text-gray-900 group-hover:text-primary-600">
                   Adicionar Produto
                 </p>
                 <p className="text-sm text-gray-500">Criar novo item</p>
@@ -164,6 +196,18 @@ export const DashboardPage = () => {
             </button>
           </div>
         </div>
+
+        {/* Modal para adicionar/editar produto */}
+        <Modal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          title={editingProduct ? 'Editar Produto' : 'Novo Produto'}
+        >
+          <AddProducts
+            onSuccess={handleProductSuccess}
+            initialData={editingProduct}
+          />
+        </Modal>
 
         {/* Info Card */}
         <div className="bg-gradient-to-r from-primary-500 to-primary-600 rounded-xl shadow-lg p-8 text-white">

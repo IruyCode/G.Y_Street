@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Button from '../common/Button';
 import Input from '../common/Input';
 
@@ -9,6 +9,25 @@ const AddProducts = ({ onSuccess, initialData }) => {
         stock: '',
         category: 'Geral'
     });
+
+    // when editing, populate the form with existing product data
+    React.useEffect(() => {
+        if (initialData) {
+            setProductData({
+                name: initialData.name || '',
+                price: initialData.price || '',
+                stock: initialData.stock || '',
+                category: initialData.category || 'Geral'
+            });
+        } else {
+            setProductData({
+                name: '',
+                price: '',
+                stock: '',
+                category: 'Geral'
+            });
+        }
+    }, [initialData]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;

@@ -82,8 +82,8 @@ export const ProductsPage = () => {
         previous: '<--',
         next: '-->'
       },
-      info: '_START_ de _TOTAL_',
-      infoEmpty: '0 a 0 de 0 entradas',
+      info: '',
+      infoEmpty: '',
       infoFiltered: '(_MAX_ resultado/s no total)'
     }
   };
@@ -164,26 +164,6 @@ export const ProductsPage = () => {
           />
         </Modal>
 
-        {/* Search and Filters 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Procurar produtos..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              />
-            </div>
-            <select className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent">
-              <option>Todas as Categorias</option>
-              <option>Electrónicos</option>
-              <option>Roupa</option>
-              <option>Alimentos</option>
-            </select>
-          </div>
-        </div> */}
-
         {products.length > 0 ? (
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden p-4 sm:p-6">
             <DataTable
@@ -200,37 +180,58 @@ export const ProductsPage = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {products.map((product) => (
-                  <tr key={product.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{product.name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 capitalize">{product.category}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{Number(product.price).toFixed(2)}€</td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${product.stock > 0 ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
-                        {product.stock}
-                      </span>
-                    </td>
+                {products.map((product) => {
+                  const stockVal = Number(product.stock);
+                  const isLow = stockVal > 0 && stockVal < 5;
+                  return (
+                    <tr
+                      key={product.id}
+                      className={`hover:bg-gray-50 transition-colors ${isLow ? 'bg-yellow-50' : ''}`}
+                    >
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {product.name}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 capitalize">
+                        {product.category}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {Number(product.price).toFixed(2)}€
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span
+                          className={`px-2.5 py-1 rounded-full text-xs font-medium ${
+                            stockVal === 0
+                              ? 'bg-red-50 text-red-700'
+                              : isLow
+                              ? 'bg-yellow-50 text-yellow-700'
+                              : 'bg-green-50 text-green-700'
+                          }`}
+                        >
+                          {product.stock}
+                        </span>
+                      </td>
 
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex justify-end gap-2">
-                        <button 
-                          onClick={() => handleOpenEdit(product)} 
-                          className="p-1 text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
-                          title="Editar"
-                        >
-                          <Pencil className="w-4 h-4" />
-                        </button>
-                        <button 
-                          onClick={() => handleDelete(product.id)}
-                          className="p-1 text-red-600 hover:bg-red-50 rounded-md transition-colors"
-                          title="Eliminar"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <div className="flex justify-end gap-2">
+                          <button 
+                            onClick={() => handleOpenEdit(product)} 
+                            className="p-1 text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+                            title="Editar"
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </button>
+                          <button 
+                            onClick={() => handleDelete(product.id)}
+                            className="p-1 text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                            title="Eliminar"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </DataTable>
           </div>
