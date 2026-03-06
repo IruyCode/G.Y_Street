@@ -5,6 +5,8 @@ export const STORAGE_KEYS = {
   REMEMBER_ME: 'gystreet_remember_me',
   USERS_DB: 'gystreet_users_db',
   SESSION_ID: 'gystreet_session_id',
+  PRODUCERS_DB: 'gystreet_producers_db',
+  PRODUCTS_DB: 'gystreet_products_db',
 };
 
 // Route paths
@@ -15,6 +17,9 @@ export const ROUTES = {
   DASHBOARD: '/dashboard',
   PRODUCTS: '/products',
   PRODUCT_DETAIL: '/products/:id',
+  PRODUCERS: '/producers',
+  PROFILE: '/profile',
+  STORE: '/store',
   NOT_FOUND: '/404',
 };
 
