@@ -186,31 +186,6 @@ export const DashboardPage = () => {
           </div>
         </div>
 
-        {/* Info Card */}
-        <div className="bg-gradient-to-r from-primary-500 to-primary-700 rounded-xl shadow-lg p-8 text-white">
-          <h3 className="text-2xl font-bold mb-2">
-            G.Y Street E-Commerce
-          </h3>
-          <p className="text-primary-100 mb-4">
-            Sistema completo com autenticação, gestão de produtores, catálogo de produtos e loja online.
-          </p>
-          <div className="flex flex-wrap gap-3">
-            <Link
-              to={ROUTES.STORE}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg text-sm font-medium transition-colors"
-            >
-              <Store className="w-4 h-4" />
-              Visitar Loja
-            </Link>
-            <Link
-              to={ROUTES.PRODUCERS}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg text-sm font-medium transition-colors"
-            >
-              <Users className="w-4 h-4" />
-              Ver Produtores
-            </Link>
-          </div>
-        </div>
       </main>
     </div>
   );
